@@ -17,8 +17,8 @@ echo "Activating virtual environment..."
 source .venv/bin/activate
 
 echo "Installing dependencies..."
-pip install -r requirements.txt --quiet
+pip install -e . --quiet
 
 echo
-echo "Bootstrap complete. Run 'python -m cli.main init' to configure the project."
+echo "Bootstrap complete. Run 'hil init' to configure the project."
 read -p "Press Enter to close..."

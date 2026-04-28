@@ -1,3 +1,19 @@
+# Vivado generated project
+vivado/hil/
+ 
+# Vivado log/temp files
+vivado/*.log
+vivado/*.jou
+vivado/*.str
+vivado/*.txt
+vivado/.Xil/
+ 
+# pip editable install artifact
+hil.egg-info/
+ 
+# Config is machine-specific
+config.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

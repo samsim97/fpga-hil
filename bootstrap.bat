@@ -17,8 +17,8 @@ echo Activating virtual environment...
 call .venv\Scripts\activate.bat
 
 echo Installing dependencies...
-pip install -r requirements.txt --quiet
+pip install -e . --quiet
 
 echo.
-echo Bootstrap complete. Run "python -m cli.main init" to configure the project.
+echo Bootstrap complete. Run "hil init" to configure the project.
 pause
