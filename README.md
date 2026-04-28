@@ -12,7 +12,7 @@ For Vivado, you need to download the board files for the Zybo Z7-20. To do this,
 1. Open Vivado  
 2. Click on `Vivado Store`  
 ![Vivado Store Link](assets/vivado_store.png)  
-3. In the store, make sure to press the `Refresh` button at the bottom of the window. This will fetch the missing board and download them. Not doing this step may result in the Zybo Z7-20 board missing. Wait for this process to finish.
+3. In the store, make sure to press the `Refresh` button at the bottom of the window. This will fetch the missing boards and download them. Not doing this step may result in the Zybo Z7-20 board missing. Wait for this process to finish.
 4. Select the `Boards` tab then select the board in the tree below:  
 Digilent Inc > Single Part > Zybo Z7-20
 5. Make sure the board is selected, then press the download button  
