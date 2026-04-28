@@ -7,7 +7,7 @@ import click
 CONFIG_FILE  = Path("config.json")
 TCL_SCRIPT   = Path("vivado/scripts/create_project.tcl")
 PROJECT_NAME = "hil"
-VIVADO_DIR   = Path("vivado")
+VIVADO_DIR   = Path("vivado/hil")
 
 
 def _vivado_executable(bin_dir: str) -> Path:
@@ -24,6 +24,9 @@ def create_project():
 
     config = json.loads(CONFIG_FILE.read_text())
     vivado = _vivado_executable(config["vivado_bin_dir"])
+    
+    if not Path.exists(VIVADO_DIR):
+        Path.mkdir(VIVADO_DIR, parents=True, exist_ok=True)
 
     cmd = [
         str(vivado),
