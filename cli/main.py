@@ -5,6 +5,7 @@ from cli.add_hdl_files import add_hdl_files
 from cli.add_constraints import add_constraints
 from cli.add_cores import add_cores
 from cli.clean import clean
+from cli.open_vivado import open_vivado
 
 @click.group()
 def cli():
@@ -16,6 +17,7 @@ cli.add_command(add_hdl_files)
 cli.add_command(add_constraints)
 cli.add_command(add_cores)
 cli.add_command(clean)
+cli.add_command(open_vivado)
 
 if __name__ == "__main__":
     cli()

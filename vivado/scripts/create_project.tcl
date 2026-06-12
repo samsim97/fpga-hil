@@ -10,6 +10,7 @@
 if {$tcl_platform(os) eq "Windows NT"} {
     set vivado_version [version -short]
     set board_repo_path "$env(APPDATA)/Xilinx/Vivado/$vivado_version/xhub/board_store/xilinx_board_store/XilinxBoardStore/Vivado/$vivado_version/boards/Digilent"
+    puts "Board repository path: $board_repo_path"
     set_param board.repoPaths $board_repo_path
 }
 
