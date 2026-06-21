@@ -1,11 +1,11 @@
 import click
-from cli.init import init
-from cli.create_project import create_project
-from cli.add_hdl_files import add_hdl_files
-from cli.add_constraints import add_constraints
-from cli.add_cores import add_cores
-from cli.clean import clean
-from cli.open_vivado import open_vivado
+from cli.vivado.init import init
+from cli.vivado.create_project import create_project
+from cli.vivado.add_hdl_files import add_hdl_files
+from cli.vivado.add_constraints import add_constraints
+from cli.vivado.add_cores import add_cores
+from cli.vivado.clean import clean
+from cli.vivado.open_vivado import open_vivado
 
 @click.group()
 def cli():
