@@ -2,9 +2,14 @@
 This repository is for the development and verification for the modules of a Zybo Z7-20 FPGA.  
 The aim is to create an HIL (Hardware in the Loop) platform.
 
+This repo covers both the hardware (Vivado) and embedded software (Vitis) tooling
+for the platform. See [`doc/repository-architecture.md`](doc/repository-architecture.md)
+for how this fits into the rest of the HIL toolchain and why it's organized this way.
+
 ## Requirements
 - Python 3
 - Vivado 2025.2
+- Vitis 2025.2
 - VSCode
 
 **Important**  
