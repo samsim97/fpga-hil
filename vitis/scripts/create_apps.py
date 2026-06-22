@@ -17,40 +17,51 @@ CONFIRMED:
   - The CPU1 domain in create_platform.py is created with
     support_app="lwip_echo_server", so its BSP should already carry the library
     settings this template needs.
-
-STILL TO VERIFY (lower stakes, not blocking):
-  - The expected platform .xpfm path below
-    (<workspace>/hil_platform/export/hil_platform/hil_platform.xpfm) is inferred
-    from the reference repos' directory layout. The interactive session that
-    confirmed the FSBL/lwIP behavior didn't exercise create_app_component, so this
-    path hasn't been directly confirmed - worth a quick check the first time this
-    script actually runs (e.g. after create_platform.py, look at what actually
-    landed under <workspace>/hil_platform/export/).
+  - _createHostComponent() calls os.path.abspath() on the platform argument, so
+    passing a bare name like "hil_platform" resolves to <CWD>/hil_platform, NOT
+    a platform-repo lookup. Must pass the absolute path to the .xpfm file.
+  - client.add_platform_repos(platform=<path>) must be called before
+    create_app_component or the server returns "does not exist in the repository".
+    The path is the directory that *contains* the platform directory
+    (i.e. export/, which contains hil_platform/).
+  - 'vitis -s' intercepts sys.exit() via 'except BaseException' and returns 0.
+    Use os._exit(1) to force a non-zero exit code on failure.
 """
+import os
 import sys
 from pathlib import Path
 import vitis
 
 workspace_dir = sys.argv[1]
-platform_xpfm = str(Path(workspace_dir) / "hil_platform" / "export" / "hil_platform" / "hil_platform.xpfm")
+platform_repo  = str(Path(workspace_dir) / "hil_platform" / "export")
+platform_xpfm  = str(Path(workspace_dir) / "hil_platform" / "export" / "hil_platform" / "hil_platform.xpfm")
 
 client = vitis.create_client()
 client.set_workspace(path=workspace_dir)
 
-hil_app = client.create_app_component(
-    name="hil_app",
-    platform=platform_xpfm,
-    domain="standalone_ps7_cortexa9_0",
-    template="empty_application",
-)
-hil_app.build()
+client.add_platform_repos(platform=platform_repo)
 
-hil_net_app = client.create_app_component(
-    name="hil_net_app",
-    platform=platform_xpfm,
-    domain="standalone_ps7_cortexa9_1",
-    template="lwip_echo_server",
-)
-hil_net_app.build()
+try:
+    hil_app = client.create_app_component(
+        name="hil_app",
+        platform=platform_xpfm,
+        domain="standalone_ps7_cortexa9_0",
+        template="empty_application",
+    )
+    hil_app.build()
+
+    hil_net_app = client.create_app_component(
+        name="hil_net_app",
+        platform=platform_xpfm,
+        domain="standalone_ps7_cortexa9_1",
+        template="lwip_echo_server",
+    )
+    hil_net_app.build()
+except Exception as e:
+    print(f"Error: {e}", file=sys.stderr)
+    sys.stderr.flush()
+    # os._exit bypasses Python's exception chain, so 'vitis -s' cannot intercept
+    # it and return 0 the way it does with sys.exit / SystemExit.
+    os._exit(1)
 
 client.close()

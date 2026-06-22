@@ -76,10 +76,11 @@ def run_vitis(py_script: Path, *script_args: str) -> int:
 
     result = subprocess.run(cmd, cwd=VITIS_WORKSPACE_DIR, capture_output=True, text=True)
 
-    if result.returncode != 0:
-        # Echoing stderr too (unlike run_vivado, which only echoes stdout) since
-        # uncaught Python exceptions in the Vitis script will land on stderr.
+    # Always print Vitis output — failures sometimes come back with rc=0 and only
+    # show up as error text in stdout/stderr.
+    if result.stdout:
         click.echo(result.stdout)
+    if result.stderr:
         click.echo(result.stderr)
 
     return result.returncode

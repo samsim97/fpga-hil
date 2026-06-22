@@ -16,6 +16,7 @@ def create_vitis_platform():
         click.echo(f"Error: hardware platform not found at {XSA_PATH}. Run 'vivado export-hardware' first.")
         return
 
+    click.echo(f"Creating Vitis platform from {XSA_PATH}...")
     rc = run_vitis(PY_SCRIPT, str(XSA_PATH.resolve()), str(VITIS_WORKSPACE_DIR.resolve()))
     if rc != 0:
         click.echo("Error: Failed to create Vitis platform.")
