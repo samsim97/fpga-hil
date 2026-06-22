@@ -12,11 +12,9 @@ def open_vitis():
         return
 
     if not VITIS_WORKSPACE_DIR.exists():
-        click.echo(f"Error: Vitis workspace not found at {VITIS_WORKSPACE_DIR}. Run 'create-vitis-platform' first.")
+        click.echo(f"Error: Vitis workspace not found at {VITIS_WORKSPACE_DIR}. Run 'vitis create-platform' first.")
         return
 
-    # '-workspace' flag confirmed against an official Vitis platform-creation
-    # tutorial (used as: vitis -workspace ./platform_repo &).
     cmd = [
         str(vitis_executable(config["vitis_bin_dir"])),
         "-w", str(VITIS_WORKSPACE_DIR.resolve()),

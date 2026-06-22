@@ -1,6 +1,9 @@
 # Vitis generated project
 vitis/hil/
 
+# Vitis generated files
+dfx_runtime.txt
+
 # Vivado generated project
 vivado/hil/
  

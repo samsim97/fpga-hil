@@ -14,7 +14,7 @@ def export_hardware():
 
     project_file = VIVADO_PROJECT_DIR / PROJECT_NAME / f"{PROJECT_NAME}.xpr"
     if not project_file.exists():
-        click.echo(f"Error: project file not found at {project_file}. Run 'create-project' first.")
+        click.echo(f"Error: project file not found at {project_file}. Run 'vivado create-project' first.")
         return
 
     rc = run_vivado(TCL_SCRIPT, PROJECT_NAME, str(VIVADO_PROJECT_DIR.resolve()), str(XSA_PATH.resolve()))

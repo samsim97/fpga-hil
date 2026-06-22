@@ -12,22 +12,39 @@ from cli.vitis.create_vitis_apps import create_vitis_apps
 from cli.vitis.build_vitis import build_vitis
 from cli.vitis.open_vitis import open_vitis
 
+
 @click.group()
 def cli():
     pass
 
+
+@cli.group()
+def vivado():
+    """Commands for managing the Vivado project."""
+    pass
+
+
+@cli.group()
+def vitis():
+    """Commands for managing the Vitis workspace."""
+    pass
+
+
 cli.add_command(init)
-cli.add_command(create_project)
-cli.add_command(add_hdl_files)
-cli.add_command(add_constraints)
-cli.add_command(add_cores)
 cli.add_command(clean)
-cli.add_command(open_vivado)
-cli.add_command(export_hardware)
-cli.add_command(create_vitis_platform)
-cli.add_command(create_vitis_apps)
-cli.add_command(build_vitis)
-cli.add_command(open_vitis)
+
+vivado.add_command(create_project)
+vivado.add_command(add_hdl_files)
+vivado.add_command(add_constraints)
+vivado.add_command(add_cores)
+vivado.add_command(export_hardware)
+vivado.add_command(open_vivado, name="open")
+
+vitis.add_command(create_vitis_platform, name="create-platform")
+vitis.add_command(create_vitis_apps, name="create-apps")
+vitis.add_command(build_vitis, name="build")
+vitis.add_command(open_vitis, name="open")
+
 
 if __name__ == "__main__":
     cli()

@@ -14,7 +14,7 @@ def open_vivado():
 
     project_file = VIVADO_PROJECT_DIR / "hil" / f"{PROJECT_NAME}.xpr"
     if not project_file.exists():
-        click.echo(f"Error: project file not found at {project_file}. Run 'create-project' first.")
+        click.echo(f"Error: project file not found at {project_file}. Run 'vivado create-project' first.")
         return
 
     cmd = [
