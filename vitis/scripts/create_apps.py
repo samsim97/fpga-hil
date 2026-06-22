@@ -28,6 +28,7 @@ CONFIRMED:
     Use os._exit(1) to force a non-zero exit code on failure.
 """
 import os
+import shutil
 import sys
 from pathlib import Path
 import vitis
@@ -35,6 +36,18 @@ import vitis
 workspace_dir = sys.argv[1]
 platform_repo  = str(Path(workspace_dir) / "hil_platform" / "export")
 platform_xpfm  = str(Path(workspace_dir) / "hil_platform" / "export" / "hil_platform" / "hil_platform.xpfm")
+fw_dir = Path(workspace_dir).parent.parent / "fw"
+
+
+def import_fw_sources(component_name: str) -> None:
+    """Copy fw/<component_name>/ into the component's src/ directory, preserving structure."""
+    src_dir = fw_dir / component_name
+    dest_dir = Path(workspace_dir) / component_name / "src"
+    files = [f for f in src_dir.rglob("*") if f.is_file() and f.name != ".gitkeep"]
+    if not files:
+        return
+    shutil.copytree(src_dir, dest_dir, ignore=shutil.ignore_patterns(".gitkeep"), dirs_exist_ok=True)
+    print(f"Imported {len(files)} source file(s) into {component_name}/src/")
 
 client = vitis.create_client()
 
@@ -48,6 +61,7 @@ try:
         domain="standalone_ps7_cortexa9_0",
         template="empty_application",
     )
+    import_fw_sources("hil_ctrl")
     hil_ctrl.build()
 
     hil_comm = client.create_app_component(
@@ -56,6 +70,7 @@ try:
         domain="standalone_ps7_cortexa9_1",
         template="lwip_echo_server",
     )
+    import_fw_sources("hil_comm")
     hil_comm.build()
 except Exception as e:
     print(f"Error: {e}", file=sys.stderr)
