@@ -39,12 +39,32 @@ platform_comp = client.create_platform_component(
 )
 platform_comp.build()
 app_comp = client.create_app_component(
-    name="hil_app", platform=platform_xpfm_path,
+    name="hil_ctrl", platform=platform_xpfm_path,
     domain="standalone_ps7_cortexa9_0", template="empty_application",
 )
 app_comp.build()
 client.close()
 ```
+
+## vitis -s exit-code and workspace lock behaviour (confirmed)
+
+**`vitis -s` intercepts all Python exceptions and exits 0.** It wraps the script in
+`except BaseException`, so `sys.exit(1)` and unhandled exceptions both return 0 to the
+caller. The only way to force a non-zero exit from inside a `vitis -s` script is
+`os._exit(1)`, which is a raw OS call that bypasses the framework entirely.
+
+**Do NOT call `client.close()` before `os._exit(1)`.** `client.close()` triggers the
+`vitis -s` shutdown hook, which exits 0 before `os._exit(1)` can run. On error paths,
+call `os._exit(1)` directly — the server process will be cleaned up by the lock-file
+pre-flight on the next run (see below).
+
+**Stale workspace lock file.** Vitis creates `<workspace>/_ide/.wsdata/.lock` when a
+workspace is opened and removes it on clean shutdown. If the script is terminated via
+`os._exit()` the lock is never released, so the next run fails with
+`"workspace already in use"` even when no Vitis process is running.
+`run_vitis()` in `cli/common.py` deletes the lock file pre-flight before every
+invocation — this is safe because `run_vitis()` is the only entry point that opens the
+workspace, so no legitimate process can hold the lock at that point.
 
 **Version control: nothing generated gets committed.** Mirrors `vivado/hil/` being
 fully gitignored — only hand-written application source and the automation scripts
@@ -61,8 +81,8 @@ deploy pipeline.
 **Naming: fixed, mirroring `PROJECT_NAME = "hil"`** (no CLI-supplied names, same as
 the Vivado side):
 - Platform component: `hil_platform`
-- App component, CPU0 (real-time HIL logic): `hil_app`
-- App component, CPU1 (networking): `hil_net_app`
+- App component, CPU0 (real-time HIL logic): `hil_ctrl`
+- App component, CPU1 (networking): `hil_comm`
 - Domain names follow Vitis's own `<os>_<cpu_instance>` convention rather than a
   custom scheme: `standalone_ps7_cortexa9_0`, `standalone_ps7_cortexa9_1`
 - FSBL boot domain: keep Vitis's default name/template as-is (it's boilerplate,
@@ -84,7 +104,7 @@ and the user deliberately chose to isolate them from lwIP's TCP/IP processing ra
 than share one core. Why *not* FreeRTOS: bare-metal lwIP is simpler and sufficient
 for this use case — no task scheduling or sockets API is needed.
 
-**Deferred, not blocking CLI work:** how `hil_app` (CPU0) and `hil_net_app` (CPU1)
+**Deferred, not blocking CLI work:** how `hil_ctrl` (CPU0) and `hil_comm` (CPU1)
 communicate with each other (shared DDR region, mailbox/IPI, OpenAMP, etc.) is an
 application-code design question, not a CLI-tooling question. Don't make assumptions
 about this when implementing the CLI commands — it doesn't affect how platform/app
@@ -140,7 +160,7 @@ Default assumption: prompt for it separately, same pattern as `init.py`'s existi
 |---|---|---|---|
 | `export-hardware` | `cli/export_hardware.py` | `add_hdl_files.py` | Vivado-side; produces the `.xsa` |
 | `create-vitis-platform` | `cli/create_vitis_platform.py` | `create_project.py` | Creates `hil_platform` with the three domains above |
-| `create-vitis-apps` | `cli/create_vitis_apps.py` | `add_hdl_files.py` | Creates `hil_app` + `hil_net_app` against the platform |
+| `create-vitis-apps` | `cli/create_vitis_apps.py` | `add_hdl_files.py` | Creates `hil_ctrl` + `hil_comm` against the platform |
 | `build-vitis` | `cli/build_vitis.py` | — (new) | Builds platform + both apps |
 | `open-vitis` | `cli/open_vitis.py` | `open_vivado.py` | Opens Vitis Unified IDE GUI on the workspace |
 
@@ -173,7 +193,7 @@ Default assumption: prompt for it separately, same pattern as `init.py`'s existi
   parameters beyond `cpu`/`os`/`name`/`display_name`. Verify interactively
   (`vitis -i`, then `help(platform.add_domain)`) before trusting platform creation
   to produce a bootable image.
-- **The exact app template string for bare-metal lwIP** (used for `hil_net_app`).
+- **The exact app template string for bare-metal lwIP** (used for `hil_comm`).
   `"lwip_echo_server"` is an educated guess, not confirmed — check available
   templates interactively before relying on it.
 - Exact Vitis workspace internal layout (where `client.set_workspace()` should point
@@ -185,5 +205,5 @@ Default assumption: prompt for it separately, same pattern as `init.py`'s existi
 - Whether `vitis_bin_dir` should be derived from `vivado_bin_dir` or configured
   separately.
 - Inter-core (CPU0 ↔ CPU1) communication mechanism — explicitly out of scope for the
-  CLI itself, but will need its own decision before `hil_app`/`hil_net_app` source
+  CLI itself, but will need its own decision before `hil_ctrl`/`hil_comm` source
   code is written.

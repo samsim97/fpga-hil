@@ -68,6 +68,15 @@ def run_vitis(py_script: Path, *script_args: str) -> int:
 
     VITIS_WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Vitis writes a lock file when a workspace is opened and removes it on clean
+    # shutdown. If a previous script was killed via os._exit() the lock is never
+    # released, causing the next run to fail with "workspace already in use".
+    # Deleting it pre-flight is safe because we verified no Vitis process is running
+    # (run_vitis() is the only entry point that opens the workspace).
+    lock_file = VITIS_WORKSPACE_DIR / "_ide" / ".wsdata" / ".lock"
+    if lock_file.exists():
+        lock_file.unlink()
+
     cmd = [
         str(vitis_executable(config["vitis_bin_dir"])),
         "-s", str(py_script.resolve()),

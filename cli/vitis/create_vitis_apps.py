@@ -8,7 +8,7 @@ PLATFORM_DIR = VITIS_WORKSPACE_DIR / "hil_platform"
 
 @click.command()
 def create_vitis_apps():
-    """Create the hil_app (CPU0) and hil_net_app (CPU1) application components."""
+    """Create the hil_ctrl and hil_comm application components."""
     if not CONFIG_FILE.exists():
         click.echo("Error: config.json not found. Run 'init' first.")
         return
@@ -22,4 +22,4 @@ def create_vitis_apps():
     if rc != 0:
         click.echo("Error: Failed to create Vitis applications.")
     else:
-        click.echo("Vitis applications 'hil_app' and 'hil_net_app' created successfully.")
+        click.echo("Vitis applications 'hil_ctrl' and 'hil_comm' created successfully.")

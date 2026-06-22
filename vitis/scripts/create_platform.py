@@ -31,6 +31,7 @@ Sources: official Xilinx Vitis-Tutorials repo (2025.2 branch), MicroZed Chronicl
 blog, and a real interactive session run against this project's actual Vitis 2025.2
 install (explore_domains.py).
 """
+import os
 import sys
 import vitis
 
@@ -38,31 +39,30 @@ xsa_path = sys.argv[1]
 workspace_dir = sys.argv[2]
 
 client = vitis.create_client()
-client.set_workspace(path=workspace_dir)
 
-# This single call also creates the FSBL boot domain automatically - confirmed,
-# see header. No separate step needed for it.
-platform = client.create_platform_component(
-    name="hil_platform",
-    hw_design=xsa_path,
-    cpu="ps7_cortexa9_0",
-    os="standalone",
-    domain_name="standalone_ps7_cortexa9_0",
-)
+try:
+    client.set_workspace(path=workspace_dir)
 
-# CPU1: networking domain. No FreeRTOS - bare-metal standalone + lwIP per the
-# settled architecture in .agent/skills/vitis-cli/SKILL.md.
-# support_app="lwip_echo_server" configures this domain's BSP with the library
-# settings the lwip_echo_server template needs (confirmed via help(add_domain)).
-platform.add_domain(
-    cpu="ps7_cortexa9_1",
-    os="standalone",
-    name="standalone_ps7_cortexa9_1",
-    display_name="standalone_ps7_cortexa9_1",
-    support_app="lwip_echo_server",
-)
+    platform = client.create_platform_component(
+        name="hil_platform",
+        hw_design=xsa_path,
+        cpu="ps7_cortexa9_0",
+        os="standalone",
+        domain_name="standalone_ps7_cortexa9_0",
+    )
 
-# Build after all domains exist.
-platform.build()
+    platform.add_domain(
+        cpu="ps7_cortexa9_1",
+        os="standalone",
+        name="standalone_ps7_cortexa9_1",
+        display_name="standalone_ps7_cortexa9_1",
+        support_app="lwip_echo_server",
+    )
+
+    platform.build()
+except Exception as e:
+    print(f"Error: {e}", file=sys.stderr)
+    sys.stderr.flush()
+    os._exit(1)
 
 client.close()
