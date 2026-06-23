@@ -72,6 +72,15 @@ try:
     )
     import_fw_sources("hil_comm")
     hil_comm.build()
+    
+    hil_test = client.create_app_component(
+        name="hil_test",
+        platform=platform_xpfm,
+        domain="standalone_ps7_cortexa9_1",
+        template="empty_application",
+    )
+    import_fw_sources("hil_test")
+    hil_test.build()
 except Exception as e:
     print(f"Error: {e}", file=sys.stderr)
     sys.stderr.flush()
