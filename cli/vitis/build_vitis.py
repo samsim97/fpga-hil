@@ -16,8 +16,8 @@ def build_vitis():
         click.echo(f"Error: Vitis workspace not found at {VITIS_WORKSPACE_DIR}. Run 'vitis create-platform' first.")
         return
 
-    rc = run_vitis(PY_SCRIPT, str(VITIS_WORKSPACE_DIR.resolve()))
-    if rc != 0:
+    return_code = run_vitis(PY_SCRIPT, str(VITIS_WORKSPACE_DIR.resolve()))
+    if return_code != 0:
         click.echo("Error: Vitis build failed.")
     else:
         click.echo("Vitis platform and applications built successfully.")

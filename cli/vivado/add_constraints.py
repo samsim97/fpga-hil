@@ -13,8 +13,8 @@ def add_constraints():
         click.echo("Error: config.json not found. Run 'init' first.")
         return
 
-    rc = run_vivado(TCL_SCRIPT, PROJECT_NAME, str(VIVADO_PROJECT_DIR.resolve()), str(CONSTRAINTS_DIR.resolve()))
-    if rc != 0:
+    return_code = run_vivado(TCL_SCRIPT, PROJECT_NAME, str(VIVADO_PROJECT_DIR.resolve()), str(CONSTRAINTS_DIR.resolve()))
+    if return_code != 0:
         click.echo("Error: Failed to add constraint files.")
     else:
         click.echo("Constraint files added successfully.")

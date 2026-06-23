@@ -17,8 +17,8 @@ def create_vitis_platform():
         return
 
     click.echo(f"Creating Vitis platform from {XSA_PATH}...")
-    rc = run_vitis(PY_SCRIPT, str(XSA_PATH.resolve()), str(VITIS_WORKSPACE_DIR.resolve()))
-    if rc != 0:
+    return_code = run_vitis(PY_SCRIPT, str(XSA_PATH.resolve()), str(VITIS_WORKSPACE_DIR.resolve()))
+    if return_code != 0:
         click.echo("Error: Failed to create Vitis platform.")
     else:
         click.echo("Vitis platform 'hil_platform' created successfully.")

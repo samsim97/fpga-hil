@@ -18,8 +18,8 @@ def create_vitis_apps():
         return
 
     click.echo(f"Creating Vitis applications from platform at {PLATFORM_DIR}...")
-    rc = run_vitis(PY_SCRIPT, str(VITIS_WORKSPACE_DIR.resolve()))
-    if rc != 0:
+    return_code = run_vitis(PY_SCRIPT, str(VITIS_WORKSPACE_DIR.resolve()))
+    if return_code != 0:
         click.echo("Error: Failed to create Vitis applications.")
     else:
         click.echo("Vitis applications 'hil_ctrl' and 'hil_comm' created successfully.")

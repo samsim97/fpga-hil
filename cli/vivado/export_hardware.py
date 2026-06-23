@@ -17,8 +17,8 @@ def export_hardware():
         click.echo(f"Error: project file not found at {project_file}. Run 'vivado create-project' first.")
         return
 
-    rc = run_vivado(TCL_SCRIPT, PROJECT_NAME, str(VIVADO_PROJECT_DIR.resolve()), str(XSA_PATH.resolve()))
-    if rc != 0:
+    return_code = run_vivado(TCL_SCRIPT, PROJECT_NAME, str(VIVADO_PROJECT_DIR.resolve()), str(XSA_PATH.resolve()))
+    if return_code != 0:
         click.echo("Error: Failed to export hardware platform.")
     else:
         click.echo(f"Hardware platform exported to {XSA_PATH}.")

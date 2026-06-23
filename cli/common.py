@@ -85,8 +85,6 @@ def run_vitis(py_script: Path, *script_args: str) -> int:
 
     result = subprocess.run(cmd, cwd=VITIS_WORKSPACE_DIR, capture_output=True, text=True)
 
-    # Always print Vitis output — failures sometimes come back with rc=0 and only
-    # show up as error text in stdout/stderr.
     if result.stdout:
         click.echo(result.stdout)
     if result.stderr:

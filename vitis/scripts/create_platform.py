@@ -2,11 +2,6 @@
 Creates the 'hil_platform' Vitis platform component with three domains:
 FSBL (boot), standalone CPU0 (real-time HIL logic), standalone+lwIP CPU1 (networking).
 
-Run via: vitis -s create_platform.py <xsa_path> <workspace_dir>
-
-VALIDATION STATUS - confirmed against a real Vitis 2025.2 session, not just docs:
-
-CONFIRMED:
   - client.create_platform_component(name=, hw_design=, cpu=, os=, domain_name=)
     creates the platform with its first domain.
   - The FSBL boot domain is created AUTOMATICALLY as part of
@@ -26,10 +21,6 @@ CONFIRMED:
     rather than being a separate library-configuration step.
   - The platform must be built (platform.build()) AFTER all domains are created,
     not after each one.
-
-Sources: official Xilinx Vitis-Tutorials repo (2025.2 branch), MicroZed Chronicles
-blog, and a real interactive session run against this project's actual Vitis 2025.2
-install (explore_domains.py).
 """
 import os
 import sys

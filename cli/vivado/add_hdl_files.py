@@ -13,8 +13,8 @@ def add_hdl_files():
         click.echo("Error: config.json not found. Run 'init' first.")
         return
 
-    rc = run_vivado(TCL_SCRIPT, PROJECT_NAME, str(VIVADO_PROJECT_DIR.resolve()), str(HDL_DIR.resolve()))
-    if rc != 0:
+    return_code = run_vivado(TCL_SCRIPT, PROJECT_NAME, str(VIVADO_PROJECT_DIR.resolve()), str(HDL_DIR.resolve()))
+    if return_code != 0:
         click.echo("Error: Failed to add HDL files.")
     else:
         click.echo("HDL files added successfully.")

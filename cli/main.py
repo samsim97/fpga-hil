@@ -1,10 +1,10 @@
 import click
-from cli.vivado.init import init
+from cli.init import init
+from cli.clean import clean
 from cli.vivado.create_project import create_project
 from cli.vivado.add_hdl_files import add_hdl_files
 from cli.vivado.add_constraints import add_constraints
 from cli.vivado.add_cores import add_cores
-from cli.vivado.clean import clean
 from cli.vivado.open_vivado import open_vivado
 from cli.vivado.export_hardware import export_hardware
 from cli.vitis.create_vitis_platform import create_vitis_platform

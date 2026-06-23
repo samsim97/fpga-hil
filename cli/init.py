@@ -1,17 +1,7 @@
 import json
-import sys
 from pathlib import Path
 import click
-
-CONFIG_FILE = Path("config.json")
-
-
-def _vivado_executable() -> str:
-    return "vivado.bat" if sys.platform == "win32" else "vivado"
-
-
-def _vitis_executable() -> str:
-    return "vitis.bat" if sys.platform == "win32" else "vitis"
+from cli.common import CONFIG_FILE, vivado_executable, vitis_executable
 
 
 @click.command()
@@ -28,8 +18,7 @@ def init(force):
     while True:
         vivado_bin_dir = click.prompt("Enter path to Vivado bin directory").strip()
         vivado_bin_path = Path(vivado_bin_dir)
-        executable = vivado_bin_path / _vivado_executable()
-
+        executable = vivado_executable(vivado_bin_dir)
         if executable.exists():
             break
         click.echo(f"Error: '{executable}' not found. Please check the path.")
@@ -37,8 +26,7 @@ def init(force):
     while True:
         vitis_bin_dir = click.prompt("Enter path to Vitis bin directory").strip()
         vitis_bin_path = Path(vitis_bin_dir)
-        executable = vitis_bin_path / _vitis_executable()
-
+        executable = vitis_executable(vitis_bin_dir)
         if executable.exists():
             break
         click.echo(f"Error: '{executable}' not found. Please check the path.")
