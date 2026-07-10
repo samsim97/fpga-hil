@@ -45,7 +45,7 @@ When `config.json` is absent, `run_vivado()` returns `-1` with no output. Every 
 
 #### W-A2 — `run_vivado()` only prints stdout on failure; `run_vitis()` always prints both
 
-These two runner functions behave differently: `run_vivado()` shows output only on non-zero exit code; `run_vitis()` always prints stdout and stderr. The `run_vitis()` comment explains why ("failures sometimes come back with rc=0"). Vivado batch-mode can also produce useful diagnostics on success. The inconsistency has no strong justification.
+These two runner functions behave differently: `run_vivado()` shows output only on non-zero exit code; `run_vitis()` always prints stdout and stderr. The `run_vitis()` comment explains why ("failures sometimes come back with return_code=0"). Vivado batch-mode can also produce useful diagnostics on success. The inconsistency has no strong justification.
 
 #### W-A3 — `open_vivado.py` hardcodes `"hil"` in the project file path
 
