@@ -1,9 +1,9 @@
 """
 Creates the 'hil_platform' Vitis platform component with three domains:
-FSBL (boot), standalone CPU0 (real-time HIL logic), standalone+lwIP CPU1 (networking).
+FSBL (boot), standalone+lwIP CPU0 (networking), standalone CPU1 (real-time HIL logic).
 
-  - client.create_platform_component(name=, hw_design=, cpu=, os=, domain_name=)
-    creates the platform with its first domain.
+  - client.create_platform_component(name=, hw_design=, cpu=, os=, domain_name=,
+    template=) creates the platform with its first domain.
   - The FSBL boot domain is created AUTOMATICALLY as part of
     create_platform_component() itself, whenever the hw_design targets a device
     that needs one. Confirmed directly: a single create_platform_component() call
@@ -11,14 +11,18 @@ FSBL (boot), standalone CPU0 (real-time HIL logic), standalone+lwIP CPU1 (networ
     'zynq_fsbl' domains - visible in the build log ("Platform FSBL Boot domain
     added successfully") and in platform.list_domains() afterward, before any
     add_domain() call was made. No explicit step is needed for it here.
-    (Consistent with this: add_domain()'s confirmed signature - cpu, os, name,
-    display_name, sd_dir, support_app, generate_dtb, dt_overlay, architecture,
-    compiler, hw_boot_bin - has no FSBL-specific parameter at all.)
-  - platform.add_domain(cpu=, os=, name=, display_name=, support_app=) adds further
-    domains. support_app=<app_name> pre-configures that domain's BSP with whatever
-    library settings the named application template needs - confirmed via
-    help(platform.add_domain). This is how lwIP gets attached to the CPU1 domain,
-    rather than being a separate library-configuration step.
+  - create_platform_component()'s template= parameter pre-configures the first
+    domain's BSP with whatever library settings the named application template
+    needs (default "Empty") - confirmed by reading the installed Vitis 2025.2
+    API source directly (Vitis/cli/vitis/cli_client.py). This is how lwIP gets
+    attached to the CPU0 domain here.
+  - platform.add_domain(cpu=, os=, name=, display_name=, support_app=) adds
+    further domains. support_app= is the equivalent knob for domains added this
+    way - confirmed by reading the installed Vitis 2025.2 API source directly
+    (Vitis/cli/vitis/platform_component.py): add_domain() forwards
+    support_app straight through as the request's `template` field, i.e.
+    create_platform_component's template= and add_domain's support_app= are the
+    same underlying mechanism under two different argument names.
   - The platform must be built (platform.build()) AFTER all domains are created,
     not after each one.
 """
@@ -40,6 +44,7 @@ try:
         cpu="ps7_cortexa9_0",
         os="standalone",
         domain_name="standalone_ps7_cortexa9_0",
+        template="lwip_echo_server",
     )
 
     platform.add_domain(
@@ -47,7 +52,6 @@ try:
         os="standalone",
         name="standalone_ps7_cortexa9_1",
         display_name="standalone_ps7_cortexa9_1",
-        support_app="lwip_echo_server",
     )
 
     platform.build()

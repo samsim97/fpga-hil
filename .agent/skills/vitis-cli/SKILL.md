@@ -39,8 +39,8 @@ platform_comp = client.create_platform_component(
 )
 platform_comp.build()
 app_comp = client.create_app_component(
-    name="hil_ctrl", platform=platform_xpfm_path,
-    domain="standalone_ps7_cortexa9_0", template="empty_application",
+    name="hil_comm", platform=platform_xpfm_path,
+    domain="standalone_ps7_cortexa9_0", template="lwip_echo_server",
 )
 app_comp.build()
 client.close()
@@ -81,8 +81,8 @@ deploy pipeline.
 **Naming: fixed, mirroring `PROJECT_NAME = "hil"`** (no CLI-supplied names, same as
 the Vivado side):
 - Platform component: `hil_platform`
-- App component, CPU0 (real-time HIL logic): `hil_ctrl`
-- App component, CPU1 (networking): `hil_comm`
+- App component, CPU0 (networking): `hil_comm`
+- App component, CPU1 (real-time HIL logic): `hil_ctrl`
 - Domain names follow Vitis's own `<os>_<cpu_instance>` convention rather than a
   custom scheme: `standalone_ps7_cortexa9_0`, `standalone_ps7_cortexa9_1`
 - FSBL boot domain: keep Vitis's default name/template as-is (it's boilerplate,
@@ -96,15 +96,15 @@ FSBL + standalone CPU0 + FreeRTOS/lwIP CPU1):
 | Domain | CPU | OS | Purpose |
 |---|---|---|---|
 | FSBL (boot) | `ps7_cortexa9_0` | standalone | Mandatory — Vitis requires this for any bootable platform |
-| `standalone_ps7_cortexa9_0` | `ps7_cortexa9_0` | standalone | Real-time HIL test logic (stimulus/measurement, including physical simulation computation for sensor emulation). Kept isolated from networking so timing isn't affected by network jitter. |
-| `standalone_ps7_cortexa9_1` | `ps7_cortexa9_1` | standalone + lwIP, **no FreeRTOS** | PS-to-host networking (report results / receive commands). Bare-metal lwIP (Xilinx's "lwIP echo server" bare-metal template) is sufficient — no RTOS needed for this. |
+| `standalone_ps7_cortexa9_0` | `ps7_cortexa9_0` | standalone + lwIP, **no FreeRTOS** | PS-to-host networking (report results / receive commands). Bare-metal lwIP (Xilinx's "lwIP echo server" bare-metal template) is sufficient — no RTOS needed for this. |
+| `standalone_ps7_cortexa9_1` | `ps7_cortexa9_1` | standalone | Real-time HIL test logic (stimulus/measurement, including physical simulation computation for sensor emulation). Kept isolated from networking so timing isn't affected by network jitter. |
 
 Why split across two cores at all: HIL test routines have real timing requirements,
 and the user deliberately chose to isolate them from lwIP's TCP/IP processing rather
 than share one core. Why *not* FreeRTOS: bare-metal lwIP is simpler and sufficient
 for this use case — no task scheduling or sockets API is needed.
 
-**Deferred, not blocking CLI work:** how `hil_ctrl` (CPU0) and `hil_comm` (CPU1)
+**Deferred, not blocking CLI work:** how `hil_comm` (CPU0) and `hil_ctrl` (CPU1)
 communicate with each other (shared DDR region, mailbox/IPI, OpenAMP, etc.) is an
 application-code design question, not a CLI-tooling question. Don't make assumptions
 about this when implementing the CLI commands — it doesn't affect how platform/app

@@ -1,7 +1,7 @@
 """
 Creates the two application components against hil_platform:
-  - hil_ctrl: real-time HIL control logic, empty_application template
-  - hil_comm: PS-to-host networking, bare-metal lwIP template
+  - hil_comm: PS-to-host networking, bare-metal lwIP template (CPU0)
+  - hil_ctrl: real-time HIL control logic, empty_application template (CPU1)
 
 Run via: vitis -s create_apps.py <workspace_dir>
 
@@ -14,8 +14,8 @@ CONFIRMED:
     application - confirmed directly against the installed Vitis 2025.2
     sw_apps directory (<Vitis_install>/data/embeddedsw/lib/sw_apps/), where it
     sits alongside empty_application, hello_world, freertos_lwip_echo_server, etc.
-  - The CPU1 domain in create_platform.py is created with
-    support_app="lwip_echo_server", so its BSP should already carry the library
+  - The CPU0 domain in create_platform.py is created with
+    template="lwip_echo_server", so its BSP should already carry the library
     settings this template needs.
   - _createHostComponent() calls os.path.abspath() on the platform argument, so
     passing a bare name like "hil_platform" resolves to <CWD>/hil_platform, NOT
@@ -55,32 +55,23 @@ try:
     client.set_workspace(path=workspace_dir)
     client.add_platform_repos(platform=platform_repo)
 
-    hil_ctrl = client.create_app_component(
-        name="hil_ctrl",
-        platform=platform_xpfm,
-        domain="standalone_ps7_cortexa9_0",
-        template="empty_application",
-    )
-    import_fw_sources("hil_ctrl")
-    hil_ctrl.build()
-
     hil_comm = client.create_app_component(
         name="hil_comm",
         platform=platform_xpfm,
-        domain="standalone_ps7_cortexa9_1",
+        domain="standalone_ps7_cortexa9_0",
         template="lwip_echo_server",
     )
     import_fw_sources("hil_comm")
     hil_comm.build()
-    
-    hil_test = client.create_app_component(
-        name="hil_test",
+
+    hil_ctrl = client.create_app_component(
+        name="hil_ctrl",
         platform=platform_xpfm,
         domain="standalone_ps7_cortexa9_1",
         template="empty_application",
     )
-    import_fw_sources("hil_test")
-    hil_test.build()
+    import_fw_sources("hil_ctrl")
+    hil_ctrl.build()
 except Exception as e:
     print(f"Error: {e}", file=sys.stderr)
     sys.stderr.flush()
